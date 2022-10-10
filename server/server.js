@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const client = require("./data");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 app.use(express.json());
@@ -31,14 +32,23 @@ app.post("/login", (req, res) => {
 				if (err) throw err;
 
 				const user = response.rows[0];
-				if (user != null) {
-					const isValidPass = await bcrypt.compare(String(password), user.password);
-					if (isValidPass) {
-						res.send(JSON.stringify({ msg: "User-found", user_id: user.user_id }));
-					} else res.send(JSON.stringify("Invalid email or password"));
-				} else {
-					res.send(JSON.stringify("Invalid email or password"));
-				}
+				if (user === null) res.send(JSON.stringify("Invalid username"));
+				const isValidPass = await bcrypt.compare(String(password), user.password);
+				if (isValidPass !== true) res.send(JSON.stringify("Invalid password"));
+				// Create JWT
+				const accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, {
+					expiresIn: "5m",
+				});
+				const refreshToken = jwt.sign({ username: user.username }, process.env.REFRESH_TOKEN_SECRET, {
+					expiresIn: "1d",
+				});
+				// Saving refreshToken with current user
+				const otherUsers = await client.query({
+					rowMode: "array",
+					text: `SELECT * FROM users WHERE username NOT LIKE '${String(username)}';`,
+				});
+				const currentUser = { ...user, refreshToken };
+				res.send(JSON.stringify({ msg: "User-found", user_id: user.user_id }));
 			}
 		);
 	} else {
