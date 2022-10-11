@@ -18,6 +18,7 @@ async function initDb() {
           user_id SERIAL PRIMARY KEY,
           username TEXT NOT NULL,
           password TEXT NOT NULL,
+          refresh_token TEXT,
           saved_albums INTEGER[]
       );`
 	);

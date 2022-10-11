@@ -43,12 +43,10 @@ app.post("/login", (req, res) => {
 					expiresIn: "1d",
 				});
 				// Saving refreshToken with current user
-				const otherUsers = await client.query({
-					rowMode: "array",
-					text: `SELECT * FROM users WHERE username NOT LIKE '${String(username)}';`,
-				});
-				const currentUser = { ...user, refreshToken };
-				res.send(JSON.stringify({ msg: "User-found", user_id: user.user_id }));
+				await client.query(`UPDATE users SET refresh_token='${refreshToken}'WHERE user_id=${user.user_id};`);
+				// Cookie by httpOnly not available for JS prevents getting the refresh token, valid for 24 hours
+				res.cookie("jwt", refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+				res.json({ accessToken });
 			}
 		);
 	} else {
