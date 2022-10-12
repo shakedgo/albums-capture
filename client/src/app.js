@@ -6,6 +6,7 @@ import Login from "./Routes/Account/Login";
 import Register from "./Routes/Account/Register";
 import AlbumsSearch from "./Routes/AlbumsSearch";
 import { UserContext } from "./UserContext";
+import Users from "./Routes/Account/Users";
 
 export default function App() {
 	const [user, setUser] = useState("default");
@@ -20,6 +21,7 @@ export default function App() {
 					</Route>
 					<Route path="login" element={<Login />}></Route>
 					<Route path="register" element={<Register />}></Route>
+					<Route path="users" element={<Users />}></Route>
 
 					<Route path="albums" element={<AlbumsSearch />}></Route>
 				</Routes>

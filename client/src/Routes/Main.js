@@ -8,6 +8,8 @@ export default function Main() {
 			<Link to="/login">Login</Link>
 			<br />
 			<Link to="/register">Register</Link>
+			<br />
+			<Link to="/users">Users</Link>
 		</div>
 	);
 }
