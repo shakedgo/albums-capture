@@ -3,12 +3,15 @@ const cors = require("cors");
 const client = require("./data");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const cookieParser = require("cookie-parser");
+const { response } = require("express");
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+
+app.use(cookieParser());
 
 app.get("/api", (_req, res) => {
 	res.json({ username: "shakedgo" });
@@ -52,6 +55,13 @@ app.post("/login", (req, res) => {
 	} else {
 		res.status(400).send({ message: "No SQLI m8!" });
 	}
+});
+
+app.post("/verify", (req, res) => {
+	const cookies = req.cookies;
+	if (!cookies?.jwt) res.status(401);
+	res.send("logged in as ...");
+	// const refreshToke = cookies.jwt
 });
 
 app.post("/register", async (req, res) => {
