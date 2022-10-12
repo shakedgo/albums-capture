@@ -58,6 +58,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/verify", (req, res) => {
+	// Verify that a user is logged in.
 	const cookies = req.cookies;
 	if (!cookies?.jwt) res.status(401);
 	res.send("logged in as ...");
@@ -69,14 +70,19 @@ app.post("/register", async (req, res) => {
 	let password = req.body.vals[1];
 	if (!format.test(String(username)) && !format.test(String(password))) {
 		const hashedPass = await bcrypt.hash(String(password), 10);
-		client.query(
-			`INSERT INTO users (username, password) VALUES ('${String(username)}', '${hashedPass}')`,
-			(err, response) => {
-				if (err) throw err;
-				res.status(200).send("Register");
-			}
-		);
-		console.log("User Created");
+		// Check if username is taken.
+		client.query(`SELECT username FROM users WHERE username='${String(username)}';`, (err, response) => {
+			if (err) throw err;
+			if (response.rows[0] !== undefined) res.send("Username Taken, please select a different username");
+			client.query(
+				`INSERT INTO users (username, password) VALUES ('${String(username)}', '${hashedPass}')`,
+				(err, response) => {
+					if (err) throw err;
+					res.status(200).send("Registered");
+				}
+			);
+			console.log("User Created");
+		});
 	} else {
 		res.status(400).send({ message: "No SQLI m8!" });
 	}

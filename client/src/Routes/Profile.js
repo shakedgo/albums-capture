@@ -1,16 +1,13 @@
-// import React, { useContext } from "react";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-// import { UserContext } from "../UserContext";
 import axios from "axios";
 
 export default function Profile() {
 	const { name } = useParams();
 	const [user, setUser] = useState();
 	useEffect(() => {
-		const user = async () => await axios.post("/verify"); // should check the cookie and send the right user that is logged in
+		const user = async () => await axios.post("/verify"); // Server should verify that a user is logged in with cookie;
 		user();
-		console.log(user.data);
 		setUser(user.data);
 	}, []);
 
